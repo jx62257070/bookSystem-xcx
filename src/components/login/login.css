@@ -14,28 +14,28 @@
     border-radius:5px;
     border:1px solid rgba(151,151,151,1);
 }
-.nei1{
+.userId{
     position: absolute;
     left:20px;
     top: 30px;   
 }
-.nei2{
+.pass{
     position: absolute;
     left:20px;
     top: 90px;
 }
-.nei3{
+.ifAdmin{
     width:360px;
     position: absolute;
     left:20px;
     top: 150px;
 }
-.nei4{
+.login{
     position: absolute;
     left:20px;
     top: 190px;
 }
-.nei5{
+.register{
     position: absolute;
     left:20px;
     top: 248px;

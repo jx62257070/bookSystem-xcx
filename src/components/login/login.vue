@@ -2,22 +2,22 @@
      <div class="box">
         <div class="boxInner">
             <form action="">
-                <div class="nei1">
-                <Input prefix="ios-contact" placeholder="请输入用户名" class="name" v-model="userName"/>
+                <div class="userId">
+                <Input prefix="ios-contact" placeholder="请输入学号" class="name" v-model="userName" :maxlength="userIdLong"/>
                  </div>
-                <div class="nei2">
-                <Input type="password" prefix="md-lock" placeholder="请输入密码" class="name" v-model="userPass"/>
+                <div class="pass">
+                <Input type="password" prefix="md-lock" placeholder="请输入密码,最多20位" class="name" v-model="userPass" :maxlength="passLong"/>
                 </div>
-                <div class="nei3">
+                <div class="ifAdmin">
                     <RadioGroup >
                         <Radio label="用户" @click.native="changeRadioU" v-model="isUser"></Radio>
                         <Radio label="管理员" @click.native="changeRadioA" v-model="isAdmin"></Radio>
                     </RadioGroup>
                 </div>
-                <div class="nei4">
+                <div class="login">
                     <Button type="info" style="width:360px;font-size:18px" @click.native="login">login</Button>
                 </div>
-                <div class="nei5">
+                <div class="register">
                     <p class="inline color1 fon1" style="display: inline-block">还没有账号？去</p>
                     <a href="javascript:" class="fr font2 clearfix" style="display: inline-block" @click="toRegister" >注册>></a>
                 </div>
@@ -33,7 +33,9 @@ import LoginServie from "@/apis/login"
                 userName:"",
                 userPass:"",
                 isAdmin:false,
-                isUser:false
+                isUser:false,
+                passLong:20,
+                userIdLong:12
             }
         },
         methods:{
@@ -70,24 +72,20 @@ import LoginServie from "@/apis/login"
                       isAdmin:this.isAdmin
                 }
                 let result =await LoginServie.login(data)
-                 switch(result.data.data)
+                let state=result.data.data.state
+                console.log(result.data.data)
+                 switch(state)
                     {
-                        case "wrong name":
+                        case "wrong id":
                             alert("用户名错误")
                             break;
                         case "wrong pass":
                             alert("密码错误")
-                            break;
-                        case "unknow admin":
-                            alert("非管理员账号")
-                            break;
-                        case "unknow user":
-                            alert("非用户账号")
-                            break;                      
+                            break;                     
                         case "right pass":
                             if(this.isAdmin==true)
                                 console.log("跳转至管理员页面");
-                            else   console.log("跳转至用户页面");     
+                            else   this.$router.push({name:"user",params:{userId:this.userName,userName:result.data.data.data}});     
                             break;                      
                     }
                 console.log(result);

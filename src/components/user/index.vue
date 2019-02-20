@@ -17,36 +17,21 @@
                         </MenuItem>
                         <MenuItem name="3">
                             <Icon type="md-contact"></Icon>
-                            <Dropdown>
-                                <a href="javascript:void(0)">
-                                    我的
-                                    <Icon type="ios-arrow-down"></Icon>
-                                </a>
-                                <DropdownMenu slot="list">
-                                    <DropdownItem>书架</DropdownItem>
-                                    <!-- <DropdownItem>炸酱面</DropdownItem>
-                                    <DropdownItem disabled>豆汁儿</DropdownItem>
-                                    <DropdownItem>冰糖葫芦</DropdownItem>
-                                    <DropdownItem divided>北京烤鸭</DropdownItem> -->
-                                </DropdownMenu>
-                            </Dropdown>
+                            我的书架
                         </MenuItem>
                     </div>
                 </Menu>
             </Header>
             <Content :style="{padding: '0 50px'}">
                 <Breadcrumb :style="{margin: '20px 0'}">
-                    <BreadcrumbItem>Home</BreadcrumbItem>
-                    <BreadcrumbItem>Components</BreadcrumbItem>
-                    <BreadcrumbItem>Layout</BreadcrumbItem>
                 </Breadcrumb>
                 <Card>
                     <div style="min-height: 400px;">
-                        Content
+                        <div class="classify"></div>
                     </div>
                 </Card>
             </Content>
-            <Footer class="layout-footer-center">2011-2016 &copy; TalkingData</Footer>
+            <Footer class="layout-footer-center"></Footer>
         </Layout>
     </div>
 </template>
@@ -55,13 +40,18 @@
         data () {
             return {
                 theme3: 'light',
-
+                userId:'',
+                userName:''
             }
         },
         methods:{
             // changeSearch:function(){  
             //         this.ifshow=!this.ifshow                 
             // }
+        },
+        created(){
+            this.userId=this.$route.params.userId
+            this.userName=this.$route.params.userName
         }
     }
 </script>

@@ -14,33 +14,44 @@
     border-radius:5px;
     border:1px solid rgba(151,151,151,1);
 }
-.nei1{
+.userId{
     position: absolute;
     left:20px;
     top: 30px;   
 }
-.nei2{
+.pass{
+    position: absolute;
+    left:20px;
+    top: 75px;
+}
+.userName{
     position: absolute;
     left:20px;
     top: 120px;
 }
-.nei4{
+.userSex{
+    position: absolute;
+    right:60px;
+    top: 120px;
+}
+.userDept{
+    position: absolute;
+    left:20px;
+    top: 165px;
+}
+.register{
     position: absolute;
     left:20px;
     top: 220px;
 }
-.name{
+.userIdInput{
     width:330px;
     height:32px;   
 }
-.rem{
-    margin-left: 5px;
-}
-.color1{
-    color: #4A4A4A;
-}
-.font2{
-    font-family: 'PingFangSC';
+.userNameInput{
+    display: inline-block;
+    width:120px;
+    height:32px;  
 }
 .title{
     margin-top:5%;
