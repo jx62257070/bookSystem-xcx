@@ -84,7 +84,7 @@ import LoginServie from "@/apis/login"
                             break;                     
                         case "right pass":
                             if(this.isAdmin==true)
-                                console.log("跳转至管理员页面");
+                                this.$router.push({name:"admin",params:{userId:this.userName}})
                             else   this.$router.push({name:"user",params:{userId:this.userName,userName:result.data.data.data}});     
                             break;                      
                     }

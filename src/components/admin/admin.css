@@ -1,0 +1,80 @@
+.layout{
+    border: 1px solid #d7dde4;
+    background: #f5f7f9;
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+    height: 600px;
+}
+.layout-header-bar{
+    position: relative;
+    background: #fff;
+    box-shadow: 0 1px 1px rgba(0,0,0,.1);
+}
+.nav{
+    height: 600px
+}
+.addBookContent{
+    margin-top: 0.5%;
+    width: 210px;
+    display: flex;
+    justify-content:space-between;
+}
+.addBookLabel{
+    padding: auto;
+    line-height: 32px;
+}
+.operation{
+    margin: 2%;
+    display: flex;
+    flex-direction:  row;/*主轴的方向 row | row-reverse | column | column-reverse*/
+    flex-wrap:wrap;/*换行 nowrap | wrap | wrap-reverse*/
+    justify-content:space-between;/*主轴上的对齐方式 flex-start | flex-end | center | space-between | space-around*/
+    align-items:center;/*交叉轴上的对齐方式 flex-start | flex-end | center | baseline | stretch*/
+}
+.manageBook{
+    position: relative;
+}
+.bookPage{
+    position: absolute;
+    right: 2%;
+    bottom: 2%;
+}
+.layout-logo-left{
+    width: 90%;
+    height: 30px;
+    background: #5b6270;
+    border-radius: 3px;
+    margin: 15px auto;
+}
+.menu-icon{
+    transition: all .3s;
+}
+.rotate-icon{
+    transform: rotate(-90deg);
+}
+.menu-item span{
+    display: inline-block;
+    overflow: hidden;
+    width: 69px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: bottom;
+    transition: width .2s ease .2s;
+}
+.menu-item i{
+    transform: translateX(0px);
+    transition: font-size .2s ease, transform .2s ease;
+    vertical-align: middle;
+    font-size: 16px;
+}
+.collapsed-menu span{
+    width: 0px;
+    transition: width .2s ease;
+}
+.collapsed-menu i{
+    transform: translateX(5px);
+    transition: font-size .2s ease .2s, transform .2s ease .2s;
+    vertical-align: middle;
+    font-size: 22px;
+}
