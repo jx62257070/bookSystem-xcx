@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import user from '@/components/user/index'
-import login from '@/components/login/login'
-import admin from '@/components/admin/admin'
-import register from '@/components/register/register'
+import user from '@/pages/user/index'
+import login from '@/pages/login/login'
+import admin from '@/pages/admin/admin'
+import register from '@/pages/register/register'
 Vue.use(Router)
 
 export default new Router({

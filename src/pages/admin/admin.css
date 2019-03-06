@@ -14,6 +14,11 @@
 .nav{
     height: 600px
 }
+.addBook{
+    display: flex;
+    justify-content:center;
+    align-items:center;
+}
 .addBookContent{
     margin-top: 0.5%;
     width: 210px;
@@ -23,6 +28,15 @@
 .addBookLabel{
     padding: auto;
     line-height: 32px;
+}
+.addBookBtn{
+    position: absolute;
+    right: 0;
+    bottom: -40px;
+}
+.delBook{
+    margin: 2%;
+    margin-top:0; 
 }
 .operation{
     margin: 2%;
