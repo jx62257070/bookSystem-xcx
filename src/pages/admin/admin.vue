@@ -503,8 +503,8 @@ export default {
         let sureData = confirm(`确认添加《${addBookData.bookName}》吗？`);
         if (sureData == true) {
           let result = await AdminServie.addBook(addBookData);
-          if(result.data.data=="success") alert("添加成功")
-          else if(result.data.data=="added") alert("已添加过的书籍!")
+          if (result.data.data == "success") alert("添加成功");
+          else if (result.data.data == "added") alert("已添加过的书籍!");
         }
       }
     },
@@ -537,6 +537,11 @@ export default {
     },
     cheBook() {
       this.changeBookNav(3);
+      this.delTxt = "";
+      this.searchDelBook = [];
+      for (let i = 0; i < 10; i++) {
+        this.updateBook[i].data = '';
+      }
     },
     toCheBook() {
       if (this.searchDelBook[0] == undefined) {
