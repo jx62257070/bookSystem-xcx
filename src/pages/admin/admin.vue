@@ -529,10 +529,15 @@ export default {
       if (this.searchDelBook[0] == undefined) {
         alert("未确定删除的书籍!!!");
       } else {
-        let data = {
-          ISBN: this.searchDelBook[0].ISBN
-        };
-        let result = await AdminServie.delBook(data);
+        let sureData = confirm(
+          `确认删除《${this.searchDelBook[0].bookName}》吗？`
+        );
+        if (sureData == true) {
+          let data = {
+            ISBN: this.searchDelBook[0].ISBN
+          };
+          let result = await AdminServie.delBook(data);
+        }
       }
     },
     cheBook() {
@@ -540,7 +545,7 @@ export default {
       this.delTxt = "";
       this.searchDelBook = [];
       for (let i = 0; i < 10; i++) {
-        this.updateBook[i].data = '';
+        this.updateBook[i].data = "";
       }
     },
     toCheBook() {
