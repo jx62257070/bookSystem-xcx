@@ -149,17 +149,18 @@
                   >
                     <span>{{item.label}}:</span>
                   </div>
+                  <span v-if="item.label =='ISBN'">{{item.data}}</span>
                   <Input
                     v-model="item.data"
                     style="width: 150px;display:inline-block"
-                    v-if="item.label!='出版时间'"
+                    v-else-if="item.label!='出版时间'"
                   />
                   <DatePicker
                     format="yyyy年MM月dd日"
                     type="date"
                     style="width: 150px;display:inline-block"
                     v-model="item.data"
-                    v-else
+                    v-else-if="item.label !='ISBN'"
                   ></DatePicker>
                 </div>
                 <div style="margin-top:10px">
@@ -459,6 +460,19 @@ export default {
       var _end = index * this.pageSize;
       this.showList = this.bookList.slice(_start, _end);
     },
+    changeTime(data) {
+      var year = new Date(data).getFullYear(); //获取完整的年份(4位,1970-????)
+      var month = new Date(data).getMonth() + 1; //获取当前月份(0-11,0代表1月)
+      var day = new Date(data).getDate(); //获取当前日(1-31)
+      if (month < 10) {
+        month = "0" + month;
+      }
+      if (day < 10) {
+        day = "0" + day;
+      }
+      let newData = year + "-" + month + "-" + day;
+      return newData;
+    },
     async addBookSQL() {
       let addBookData = {
         ISBN: this.addBook[0].data,
@@ -472,16 +486,7 @@ export default {
         price: this.addBook[8].data,
         note: this.addBook[9].data
       };
-      var year = new Date(addBookData.pressTime).getFullYear(); //获取完整的年份(4位,1970-????)
-      var month = new Date(addBookData.pressTime).getMonth() + 1; //获取当前月份(0-11,0代表1月)
-      var day = new Date(addBookData.pressTime).getDate(); //获取当前日(1-31)
-      if (month < 10) {
-        month = "0" + month;
-      }
-      if (day < 10) {
-        day = "0" + day;
-      }
-      addBookData.pressTime = year + "-" + month + "-" + day;
+      addBookData.pressTime = this.changeTime(addBookData.pressTime);
       if (addBookData.ISBN == "") {
         alert("ISBN不能为空！");
       } else if (addBookData.bookName == "") {
@@ -498,6 +503,8 @@ export default {
         let sureData = confirm(`确认添加《${addBookData.bookName}》吗？`);
         if (sureData == true) {
           let result = await AdminServie.addBook(addBookData);
+          if(result.data.data=="success") alert("添加成功")
+          else if(result.data.data=="added") alert("已添加过的书籍!")
         }
       }
     },
@@ -515,11 +522,6 @@ export default {
         alert("未存入的书籍!!!");
       } else {
         let delBook = result.data.data;
-        delBook.bookName = delBook.book_name;
-        delete delBook.book_name;
-        delBook.pressTime = delBook.press_date;
-        delete delBook.press_date;
-        if (delBook.pressTime == "0000-00-00") delBook.pressTime = "";
         this.$set(this.searchDelBook, 0, delBook);
       }
     },
@@ -559,7 +561,20 @@ export default {
         // this.updateBook[9].data=this.searchDelBook[0].note
       }
     },
-    async sureche() {}
+    async sureche() {
+      if (this.updateBook[0].data == "") alert("请确认修改内容!!!");
+      else {
+        let update = {};
+        for (let i = 0; i < 10; i++) {
+          update[this.updateBook[i].value] = this.updateBook[i].data;
+        }
+        if (update.pressTime == "") update.pressTime = "0000-00-00";
+        else update.pressTime = this.changeTime(update.pressTime);
+        let result = await AdminServie.updateBook(update);
+        if (result.data.data == "success") alert("修改成功");
+        else alert("修改失败,请重试");
+      }
+    }
   }
 };
 </script>

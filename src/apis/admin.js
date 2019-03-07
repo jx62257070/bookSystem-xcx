@@ -18,6 +18,10 @@ AdminServie.searchBook=function(data){
 AdminServie.delBook=function(data){
     return request.post('/Admin/delBook',data)
 }
+//更新书籍接口
+AdminServie.updateBook=function(data){
+    return request.post('/Admin/updateBook',data)
+}
 
 
 export default AdminServie
