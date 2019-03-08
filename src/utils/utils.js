@@ -1,6 +1,15 @@
 const utils = {
-    checkBook(){
-        
+    checkBook(book){
+        for(var item in book){
+            switch (item) {
+                case value:
+                    
+                    break;
+            
+                default:
+                    break;
+            }
+        }
     }
 }
 

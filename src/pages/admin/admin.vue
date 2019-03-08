@@ -99,6 +99,7 @@
                   :placeholder="item.checked"
                   style="width: 150px;display:inline-block"
                   v-if="item.label!='出版时间'"
+                  :maxlength="addBookLong"
                 />
                 <DatePicker
                   format="yyyy年MM月dd日"
@@ -198,15 +199,16 @@ export default {
       showList: [], // 显示的表格
       dataCount: 0, // 总条数
       pageSize: 6, // 每页显示多少条
-      navData: [true, false, false, false],
+      navData: [false, false, false, false],
       bookNav: [false, false, false, false],
       searchType: "",
+      addBookLong:13,
       addBook: [
         {
           value: "ISBN",
           label: "ISBN",
           data: "",
-          checked: "必填.."
+          checked: "必填+数字.."
         },
         {
           value: "bookName",
@@ -224,7 +226,7 @@ export default {
           value: "type",
           label: "类型",
           data: "",
-          checked: "必填.."
+          checked: "必填+大写字母.."
         },
         {
           value: "press",
