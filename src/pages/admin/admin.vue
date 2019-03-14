@@ -43,6 +43,7 @@
             type="md-menu"
             size="24"
           ></Icon>
+          <span>你好,{{userName}}</span>
         </Header>
         <Content
           :style="{margin: '20px', background: '#fff', minHeight: '260px'}"
@@ -54,37 +55,9 @@
             <Button type="info" @click.native="addBookF">添加书籍</Button>
             <Button type="info" @click.native="delBook">删除书籍</Button>
             <Button type="info" @click.native="cheBook">修改书籍</Button>
-            <div style="width:300px">
-              <Select
-                v-model="searchType"
-                style="width:70px;display:inline-block"
-                v-show="bookNav[0]"
-              >
-                <Option
-                  v-for="item in searchList"
-                  :value="item.value"
-                  :key="item.value"
-                >{{ item.label }}</Option>
-              </Select>
-              <div style="display:inline-block" v-show="bookNav[0]">
-                <Input
-                  search
-                  placeholder="搜索前请选择搜索对象..."
-                  v-model="searchTxt"
-                  @on-search="searchBook"
-                />
-              </div>
-            </div>
           </div>
           <div class="bookList" v-show="bookNav[0]">
-            <Table :style="{margin: '20px'}" :columns="columns1" :data="showList"></Table>
-            <Page
-              :total="dataCount"
-              :page-size="pageSize"
-              show-total
-              @on-change="changepage"
-              class="bookPage"
-            ></Page>
+            <dataList :totalList='bookList' States='book' :ifSearch="stateTrue"></dataList>
           </div>
           <div class="addBook" v-show="bookNav[1]">
             <div style="position: relative">
@@ -127,7 +100,7 @@
               style="width:500px"
             />
             <div style="height:20px"></div>
-            <Table :columns="columns1" :data="searchDelBook"></Table>
+                <dataList v-bind:totalList='searchDelBook' States='book' :ifSearch="stateTrue"></dataList>
             <div style="margin-top:20px">
               <Button type="info" style="margin-right:10px" @click.native="sureDel">确认删除</Button>
             </div>
@@ -142,7 +115,7 @@
                 style="width:500px"
               />
               <div style="height:20px"></div>
-              <Table :columns="columns1" :data="searchDelBook"></Table>
+                <dataList :totalList='searchDelBook' States='book' :ifSearch="statefalse"></dataList>
               <div style="margin-top:20px">
                 <div v-for="item in updateBook" class="addBookContent" style="display:inline-block">
                   <div
@@ -175,7 +148,13 @@
         <Content
           :style="{margin: '20px', background: '#fff', minHeight: '260px'}"
           v-show="navData[1]"
-        >manageUser</Content>
+        >
+          <div style="margin: 2%;">
+            <Button type="primary" @click.native="getUserList">获取用户列表</Button>
+            <Button type="info" @click.native="cheUser" >修改用户信息</Button>
+          </div>
+          <dataList :totalList='bookList' States='user' :ifSearch="statefalse"></dataList>
+        </Content>
         <Content
           :style="{margin: '20px', background: '#fff', minHeight: '260px'}"
           v-show="navData[2]"
@@ -190,19 +169,20 @@
 </template>
 <script>
 import AdminServie from "@/apis/admin";
+import dataList from '@/components/dataList'
 export default {
-  components: {},
+  components: {
+    dataList,
+  },
   data() {
     return {
+      userName: "",
+      stateTrue:true,
+      statefalse:false,
       isCollapsed: false,
-      searchTxt: "",
-      showList: [], // 显示的表格
-      dataCount: 0, // 总条数
-      pageSize: 6, // 每页显示多少条
       navData: [false, false, false, false],
       bookNav: [false, false, false, false],
-      searchType: "",
-      addBookLong:13,
+      addBookLong: 13,
       addBook: [
         {
           value: "ISBN",
@@ -263,72 +243,6 @@ export default {
           label: "备注",
           data: "",
           checked: "选填.."
-        }
-      ],
-      searchList: [
-        {
-          value: "ISBN",
-          label: "ISBN"
-        },
-        {
-          value: "bookName",
-          label: "书名"
-        },
-        {
-          value: "author",
-          label: "作者"
-        },
-        {
-          value: "type",
-          label: "类型"
-        },
-        {
-          value: "press",
-          label: "出版社"
-        }
-      ],
-      columns1: [
-        {
-          title: "ISBN",
-          key: "ISBN"
-        },
-        {
-          title: "书名",
-          key: "bookName"
-        },
-        {
-          title: "作者",
-          key: "author"
-        },
-        {
-          title: "类型",
-          key: "type"
-        },
-        {
-          title: "出版社",
-          key: "press"
-        },
-        {
-          title: "出版时间",
-          key: "pressTime"
-        },
-        {
-          title: "单价",
-          key: "price",
-          sortable: true
-        },
-        {
-          title: "库存",
-          key: "stock",
-          sortable: true
-        },
-        {
-          title: "位置",
-          key: "position"
-        },
-        {
-          title: "备注",
-          key: "bookNote"
         }
       ],
       bookList: [],
@@ -396,9 +310,16 @@ export default {
     },
     menuitemClasses() {
       return ["menu-item", this.isCollapsed ? "collapsed-menu" : ""];
-    }
+    },
   },
-  created() {},
+  created() {
+      if (this.$route.params.userId == undefined) {
+        alert("请登录！");
+        this.$router.push({ name: "login" });
+      } else {
+        this.userName = this.$route.params.userId;
+      }
+  },
   methods: {
     clearAddBook() {
       this.addBook.map(item => {
@@ -407,24 +328,6 @@ export default {
     },
     collapsedSider() {
       this.$refs.side1.toggleCollapse();
-    },
-    searchBook() {
-      if (this.searchTxt == "") {
-        if (this.bookList < this.pageSize) {
-          this.showList = this.bookList;
-        } else {
-          this.showList = this.bookList.slice(0, this.pageSize);
-        }
-        this.dataCount = this.bookList.length;
-      } else {
-        this.showList = [];
-        let SearchType = this.searchType;
-        for (let i = 0; i < this.bookList.length; i++) {
-          if (this.bookList[i][SearchType] == this.searchTxt)
-            this.showList.push(this.bookList[i]);
-        }
-        this.dataCount = this.showList.length;
-      }
     },
     changeNav(name) {
       for (let i = 0; i < 4; i++) {
@@ -586,6 +489,10 @@ export default {
         if (result.data.data == "success") alert("修改成功");
         else alert("修改失败,请重试");
       }
+    },
+    async getUserList(){
+      let result = await AdminServie.getBookList();
+      this.bookList = result.data.data;
     }
   }
 };
