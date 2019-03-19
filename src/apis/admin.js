@@ -22,6 +22,16 @@ AdminServie.delBook=function(data){
 AdminServie.updateBook=function(data){
     return request.post('/Admin/updateBook',data)
 }
-
-
+//获取用户列表接口
+AdminServie.getUserList=function(){
+    return request.post('/Admin/getUserList')
+}
+//搜索用户接口
+AdminServie.searchUser=function(data){
+    return request.post('/Admin/searchUser',data)
+}
+//更新用户接口
+AdminServie.updateUser=function(data){
+    return request.post('/Admin/updateUser',data)
+}
 export default AdminServie

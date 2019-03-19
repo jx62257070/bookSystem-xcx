@@ -32,6 +32,10 @@
             <Icon type="md-paper-plane"></Icon>
             <span>借/还书</span>
           </MenuItem>
+          <MenuItem name="4">
+            <Icon type="md-book"></Icon>
+            <span>操作记录</span>
+          </MenuItem>
         </Menu>
       </Sider>
       <Layout>
@@ -57,7 +61,7 @@
             <Button type="info" @click.native="cheBook">修改书籍</Button>
           </div>
           <div class="bookList" v-show="bookNav[0]">
-            <dataList :totalList='bookList' States='book' :ifSearch="stateTrue"></dataList>
+            <dataList :totalList="bookList" States="book" :ifSearch="stateTrue"></dataList>
           </div>
           <div class="addBook" v-show="bookNav[1]">
             <div style="position: relative">
@@ -97,10 +101,9 @@
               placeholder="输入需要删除书籍的ISBN"
               v-model="delTxt"
               @on-search="searchDel"
-              style="width:500px"
+              style="width:500px;margin-left:2%"
             />
-            <div style="height:20px"></div>
-                <dataList v-bind:totalList='searchDelBook' States='book' :ifSearch="stateTrue"></dataList>
+            <dataList v-bind:totalList="searchDelBook" States="book" :ifSearch="stateFalse"></dataList>
             <div style="margin-top:20px">
               <Button type="info" style="margin-right:10px" @click.native="sureDel">确认删除</Button>
             </div>
@@ -112,10 +115,9 @@
                 placeholder="输入需要修改书籍的ISBN"
                 v-model="delTxt"
                 @on-search="searchDel"
-                style="width:500px"
+                style="width:500px;margin-left:2%"
               />
-              <div style="height:20px"></div>
-                <dataList :totalList='searchDelBook' States='book' :ifSearch="statefalse"></dataList>
+              <dataList :totalList="searchDelBook" States="book" :ifSearch="stateFalse"></dataList>
               <div style="margin-top:20px">
                 <div v-for="item in updateBook" class="addBookContent" style="display:inline-block">
                   <div
@@ -123,7 +125,7 @@
                   >
                     <span>{{item.label}}:</span>
                   </div>
-                  <span v-if="item.label =='ISBN'">{{item.data}}</span>
+                  <span v-if="item.value =='ISBN'">{{item.data}}</span>
                   <Input
                     v-model="item.data"
                     style="width: 150px;display:inline-block"
@@ -151,9 +153,37 @@
         >
           <div style="margin: 2%;">
             <Button type="primary" @click.native="getUserList">获取用户列表</Button>
-            <Button type="info" @click.native="cheUser" >修改用户信息</Button>
+            <Button type="info" @click.native="cheUser">修改用户信息</Button>
           </div>
-          <dataList :totalList='bookList' States='user' :ifSearch="statefalse"></dataList>
+          <dataList :totalList="userList" States="user" :ifSearch="stateTrue" v-if="userNav[0]"></dataList>
+          <div class="cheUser" v-if="userNav[1]">
+            <div style="margin: 2%;margin-top:0;">
+              <Input
+                search
+                placeholder="输入需要修改用户学号"
+                v-model="delTxt"
+                @on-search="searchUser"
+                style="width:500px;margin-left:2%"
+                :maxlength="userIdLong"
+              />
+              <dataList :totalList="searchCheUser" States="user" :ifSearch="stateFalse"></dataList>
+              <div style="margin-top:20px">
+                <div v-for="item in updateUser" class="addBookContent" style="display:inline-block">
+                  <div
+                    style="width:52px;display:inline-flex;justify-content:center;align-items:center"
+                  >
+                    <span>{{item.label}}:</span>
+                  </div>
+                  <span v-if="item.value =='userId'">{{item.data}}</span>
+                  <Input v-else v-model="item.data" style="width: 150px;display:inline-block"/>
+                </div>
+                <div style="margin-top:10px">
+                  <Button type="info" style="margin-right:10px" @click.native="toCheUser">进行修改</Button>
+                  <Button type="info" style="margin-right:10px" @click.native="sureChe">确认修改</Button>
+                </div>
+              </div>
+            </div>
+          </div>
         </Content>
         <Content
           :style="{margin: '20px', background: '#fff', minHeight: '260px'}"
@@ -169,19 +199,21 @@
 </template>
 <script>
 import AdminServie from "@/apis/admin";
-import dataList from '@/components/dataList'
+import dataList from "@/components/dataList";
 export default {
   components: {
-    dataList,
+    dataList
   },
   data() {
     return {
       userName: "",
-      stateTrue:true,
-      statefalse:false,
+      userIdLong: 12,
+      stateTrue: true,
+      stateFalse: false,
       isCollapsed: false,
-      navData: [false, false, false, false],
+      navData: [false, false, false, false,false],
       bookNav: [false, false, false, false],
+      userNav: [false, false],
       addBookLong: 13,
       addBook: [
         {
@@ -246,10 +278,12 @@ export default {
         }
       ],
       bookList: [],
+      userList: [],
       delTxt: "",
       searchDelBook: [],
       searchCheBook: [],
       sureCheBook: [],
+      searchCheUser: [],
       updateBook: [
         {
           value: "ISBN",
@@ -301,6 +335,38 @@ export default {
           label: "备注",
           data: ""
         }
+      ],
+      updateUser: [
+        {
+          value: "userId",
+          label: "学号",
+          data: ""
+        },
+        {
+          value: "userName",
+          label: "姓名",
+          data: ""
+        },
+        {
+          value: "password",
+          label: "密码",
+          data: ""
+        },
+        {
+          value: "userSex",
+          label: "性别",
+          data: ""
+        },
+        {
+          value: "userDept",
+          label: "学部",
+          data: ""
+        },
+        {
+          value: "note",
+          label: "备注",
+          data: ""
+        }
       ]
     };
   },
@@ -310,15 +376,15 @@ export default {
     },
     menuitemClasses() {
       return ["menu-item", this.isCollapsed ? "collapsed-menu" : ""];
-    },
+    }
   },
   created() {
-      if (this.$route.params.userId == undefined) {
-        alert("请登录！");
-        this.$router.push({ name: "login" });
-      } else {
-        this.userName = this.$route.params.userId;
-      }
+    if (this.$route.params.userId == undefined) {
+      alert("请登录！");
+      this.$router.push({ name: "login" });
+    } else {
+      this.userName = this.$route.params.userId;
+    }
   },
   methods: {
     clearAddBook() {
@@ -330,21 +396,21 @@ export default {
       this.$refs.side1.toggleCollapse();
     },
     changeNav(name) {
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < this.navData.length; i++) {
         if (i == name) this.$set(this.navData, i, true);
         //vue检测不到直接索引设置元素，用vue.$set(this.$set)来更新数组或者对象
         else this.$set(this.navData, i, false);
       }
     },
-    changeBookNav(name) {
-      for (let i = 0; i < 4; i++) {
-        if (i == name) this.$set(this.bookNav, i, true);
+    changeChildNav(name, nav) {
+      for (let i = 0; i < this[nav].length; i++) {
+        if (i == name) this.$set(this[nav], i, true);
         //vue检测不到直接索引设置元素，用vue.$set(this.$set)来更新数组或者对象
-        else this.$set(this.bookNav, i, false);
+        else this.$set(this[nav], i, false);
       }
     },
     async getBookList() {
-      this.changeBookNav(0);
+      this.changeChildNav(0, "bookNav");
       //获取数据 start
       let result = await AdminServie.getBookList();
       this.bookList = result.data.data;
@@ -357,7 +423,7 @@ export default {
       this.dataCount = this.bookList.length;
     },
     async addBookF() {
-      this.changeBookNav(1);
+      this.changeChildNav(1, "bookNav");
       this.clearAddBook();
     },
     changepage(index) {
@@ -414,7 +480,7 @@ export default {
       }
     },
     delBook() {
-      this.changeBookNav(2);
+      this.changeChildNav(2, "bookNav");
       this.delTxt = "";
       this.searchDelBook = [];
     },
@@ -446,7 +512,7 @@ export default {
       }
     },
     cheBook() {
-      this.changeBookNav(3);
+      this.changeChildNav(3, "bookNav");
       this.delTxt = "";
       this.searchDelBook = [];
       for (let i = 0; i < 10; i++) {
@@ -490,9 +556,54 @@ export default {
         else alert("修改失败,请重试");
       }
     },
-    async getUserList(){
-      let result = await AdminServie.getBookList();
-      this.bookList = result.data.data;
+    async getUserList() {
+      this.changeChildNav(0, "userNav");
+      let result = await AdminServie.getUserList();
+      this.userList = result.data.data;
+    },
+    cheUser() {
+      this.changeChildNav(1, "userNav");
+      this.delTxt = "";
+      this.searchCheUser = [];
+      for (let i = 0; i < this.updateUser.length; i++) {
+        this.updateUser[i].data = "";
+      }
+    },
+    async searchUser() {
+      let data = {
+        userId: this.delTxt
+      };
+      let result = await AdminServie.searchUser(data);
+      if (result.data.data == "no user") {
+        alert("未注册的用户!!!");
+      } else {
+        let user = result.data.data;
+        this.$set(this.searchCheUser, 0, user);
+      }
+    },
+    toCheUser() {
+      if (this.searchCheUser[0] == undefined) {
+        alert("未搜索到用户!!!");
+      } else {
+        for (let i = 0; i < this.updateUser.length; i++) {
+          this.updateUser[i].data = this.searchCheUser[0][
+            this.updateUser[i].value
+          ];
+        }
+      }
+    },
+    async sureChe() {
+      if (this.updateUser[0].data == "") alert("请确认修改内容!!!");
+      else {
+        let update = {};
+        for (let i = 0; i < this.updateUser.length; i++) {
+          if(this.updateUser[i].data==null) update[this.updateUser[i].value] = '';
+          else  update[this.updateUser[i].value] = this.updateUser[i].data;
+        }
+        let result = await AdminServie.updateUser(update);
+        if (result.data.data == "success") alert("修改成功");
+        else alert("修改失败,请重试");
+      }
     }
   }
 };

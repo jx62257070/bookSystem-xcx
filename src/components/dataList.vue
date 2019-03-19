@@ -3,7 +3,7 @@
     <div style="position:relative">
       <div class="searchFromBookList" v-if="ifSearch">
         <Select v-model="searchType" style="width:70px;display:inline-block">
-          <Option v-for="item in searchList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          <Option v-for="item in (States=='book') ? searchBookList:searchUserList" :value="item.value" :key="item.value">{{ item.label }}</Option>
         </Select>
         <div style="display:inline-block">
           <Input search placeholder="搜索前请选择搜索对象..." v-model="searchTxt" @on-search="searchBook"/>
@@ -33,7 +33,7 @@ export default {
       showList: [],
       searchType: "",
       searchTxt: "",
-      searchList: [
+      searchBookList: [
         {
           value: "ISBN",
           label: "ISBN"
@@ -54,6 +54,20 @@ export default {
           value: "press",
           label: "出版社"
         }
+      ],
+      searchUserList: [
+        {
+          value: "userId",
+          label: "学号"
+        },
+        {
+          value: "userName",
+          label: "姓名"
+        },
+        {
+          value: "userDept",
+          label: "学部"
+        },
       ],
       columns1: [
         {
@@ -114,7 +128,8 @@ export default {
         },
         {
           title: "性别",
-          key: "userSex"
+          key: "userSex",
+          sortable: true
         },
         {
           title: "学部",
