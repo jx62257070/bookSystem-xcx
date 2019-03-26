@@ -47,7 +47,7 @@
             type="md-menu"
             size="24"
           ></Icon>
-          <span>你好,{{userName}}</span>
+          <span>你好,{{adminId}}</span>
         </Header>
         <Content
           :style="{margin: '20px', background: '#fff', minHeight: '260px'}"
@@ -188,7 +188,40 @@
         <Content
           :style="{margin: '20px', background: '#fff', minHeight: '260px'}"
           v-show="navData[2]"
-        >manageAdmin</Content>
+        >
+          <div style="margin: 2%;">
+            <Button type="primary" @click.native="getUserList">获取管理员列表</Button>
+            <Button type="info" @click.native="cheUser">修改管理员信息</Button>
+          </div>
+          <dataList :totalList="userList" States="user" :ifSearch="stateTrue" v-if="userNav[0]"></dataList>
+          <div class="cheUser" v-if="userNav[1]">
+            <div style="margin: 2%;margin-top:0;">
+              <Input
+                search
+                placeholder="输入需要修改管理员ID"
+                v-model="delTxt"
+                @on-search="searchUser"
+                style="width:500px;margin-left:2%"
+              />
+              <dataList :totalList="searchCheUser" States="user" :ifSearch="stateFalse"></dataList>
+              <div style="margin-top:20px">
+                <div v-for="item in updateUser" class="addBookContent" style="display:inline-block">
+                  <div
+                    style="width:52px;display:inline-flex;justify-content:center;align-items:center"
+                  >
+                    <span>{{item.label}}:</span>
+                  </div>
+                  <span v-if="item.value =='userId'">{{item.data}}</span>
+                  <Input v-else v-model="item.data" style="width: 150px;display:inline-block"/>
+                </div>
+                <div style="margin-top:10px">
+                  <Button type="info" style="margin-right:10px" @click.native="toCheUser">进行修改</Button>
+                  <Button type="info" style="margin-right:10px" @click.native="sureChe">确认修改</Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Content>
         <Content
           :style="{margin: '20px', background: '#fff', minHeight: '260px'}"
           v-show="navData[3]"
@@ -206,12 +239,13 @@ export default {
   },
   data() {
     return {
-      userName: "",
+      adminId: "",
+      permission: "",
       userIdLong: 12,
       stateTrue: true,
       stateFalse: false,
       isCollapsed: false,
-      navData: [false, false, false, false,false],
+      navData: [false, false, false, false, false],
       bookNav: [false, false, false, false],
       userNav: [false, false],
       addBookLong: 13,
@@ -383,7 +417,8 @@ export default {
       alert("请登录！");
       this.$router.push({ name: "login" });
     } else {
-      this.userName = this.$route.params.userId;
+      this.adminId = this.$route.params.userId;
+      this.permission = this.$route.params.permission;
     }
   },
   methods: {
@@ -455,7 +490,8 @@ export default {
         stock: this.addBook[6].data,
         position: this.addBook[7].data,
         price: this.addBook[8].data,
-        note: this.addBook[9].data
+        note: this.addBook[9].data,
+        adminId: this.adminId
       };
       addBookData.pressTime = this.changeTime(addBookData.pressTime);
       if (addBookData.ISBN == "") {
@@ -597,8 +633,9 @@ export default {
       else {
         let update = {};
         for (let i = 0; i < this.updateUser.length; i++) {
-          if(this.updateUser[i].data==null) update[this.updateUser[i].value] = '';
-          else  update[this.updateUser[i].value] = this.updateUser[i].data;
+          if (this.updateUser[i].data == null)
+            update[this.updateUser[i].value] = "";
+          else update[this.updateUser[i].value] = this.updateUser[i].data;
         }
         let result = await AdminServie.updateUser(update);
         if (result.data.data == "success") alert("修改成功");
