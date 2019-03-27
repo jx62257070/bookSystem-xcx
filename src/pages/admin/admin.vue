@@ -190,28 +190,28 @@
           v-show="navData[2]"
         >
           <div style="margin: 2%;">
-            <Button type="primary" @click.native="getUserList">获取管理员列表</Button>
-            <Button type="info" @click.native="cheUser">修改管理员信息</Button>
+            <Button type="primary" @click.native="getAdminList">获取管理员列表</Button>
+            <Button type="info" @click.native="cheAdmin">修改管理员信息</Button>
           </div>
-          <dataList :totalList="userList" States="user" :ifSearch="stateTrue" v-if="userNav[0]"></dataList>
-          <div class="cheUser" v-if="userNav[1]">
+          <dataList :totalList="adminList" States="admin" :ifSearch="stateTrue" v-if="adminNav[0]"></dataList>
+          <div class="cheUser" v-if="adminNav[1]">
             <div style="margin: 2%;margin-top:0;">
               <Input
                 search
                 placeholder="输入需要修改管理员ID"
                 v-model="delTxt"
-                @on-search="searchUser"
+                @on-search="searchAdmin"
                 style="width:500px;margin-left:2%"
               />
-              <dataList :totalList="searchCheUser" States="user" :ifSearch="stateFalse"></dataList>
+              <dataList :totalList="searchCheAdmin" States="admin" :ifSearch="stateFalse"></dataList>
               <div style="margin-top:20px">
-                <div v-for="item in updateUser" class="addBookContent" style="display:inline-block">
+                <div v-for="item in updateAdmin" class="addBookContent" style="display:inline-block">
                   <div
                     style="width:52px;display:inline-flex;justify-content:center;align-items:center"
                   >
                     <span>{{item.label}}:</span>
                   </div>
-                  <span v-if="item.value =='userId'">{{item.data}}</span>
+                  <span v-if="item.value =='adminId'">{{item.data}}</span>
                   <Input v-else v-model="item.data" style="width: 150px;display:inline-block"/>
                 </div>
                 <div style="margin-top:10px">
@@ -248,6 +248,7 @@ export default {
       navData: [false, false, false, false, false],
       bookNav: [false, false, false, false],
       userNav: [false, false],
+      adminNav: [false, false],
       addBookLong: 13,
       addBook: [
         {
@@ -313,11 +314,14 @@ export default {
       ],
       bookList: [],
       userList: [],
+      adminList: [],
       delTxt: "",
       searchDelBook: [],
       searchCheBook: [],
+      searchCheAdmin: [],
       sureCheBook: [],
       searchCheUser: [],
+      searchCheAdmin: [],
       updateBook: [
         {
           value: "ISBN",
@@ -401,7 +405,44 @@ export default {
           label: "备注",
           data: ""
         }
-      ]
+      ],
+      updateAdmin:[
+        {
+          value: "adminId",
+          label: "ID",
+          data: ""
+        },
+        {
+          value: "adminName",
+          label: "姓名",
+          data: ""
+        },
+        {
+          value: "password",
+          label: "密码",
+          data: ""
+        },
+        {
+          value: "adminSex",
+          label: "性别",
+          data: ""
+        },
+        {
+          value: "adminPhone",
+          label: "电话",
+          data: ""
+        },
+        {
+          value: "permission",
+          label: "权限",
+          data: ""
+        },
+        {
+          value: "note",
+          label: "备注",
+          data: ""
+        },
+      ],
     };
   },
   computed: {
@@ -641,7 +682,32 @@ export default {
         if (result.data.data == "success") alert("修改成功");
         else alert("修改失败,请重试");
       }
-    }
+    },
+    async getAdminList() {
+      this.changeChildNav(0, "adminNav");
+      let result = await AdminServie.getAdminList();
+      this.adminList = result.data.data;
+    },
+    async searchAdmin() {
+      let data = {
+        adminId: this.delTxt
+      };
+      let result = await AdminServie.searchAdmin(data);
+      if (result.data.data == "no admin") {
+        alert("未注册的管理员!!!");
+      } else {
+        let user = result.data.data;
+        this.$set(this.searchCheAdmin, 0, user);
+      }
+    },
+    cheAdmin() {
+      this.changeChildNav(1, "adminNav");
+      this.delTxt = "";
+      this.searchCheUser = [];
+      for (let i = 0; i < this.updateAdmin.length; i++) {
+        this.updateAdmin[i].data = "";
+      }
+    },
   }
 };
 </script>

@@ -34,4 +34,12 @@ AdminServie.searchUser=function(data){
 AdminServie.updateUser=function(data){
     return request.post('/Admin/updateUser',data)
 }
+//获取管理员列表接口
+AdminServie.getAdminList=function(){
+    return request.post('/Admin/getAdminList')
+}
+//搜索管理员接口
+AdminServie.searchAdmin=function(data){
+    return request.post('/Admin/searchAdmin',data)
+}
 export default AdminServie

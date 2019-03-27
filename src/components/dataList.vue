@@ -3,17 +3,17 @@
     <div style="position:relative">
       <div class="searchFromBookList" v-if="ifSearch">
         <Select v-model="searchType" style="width:70px;display:inline-block">
-          <Option v-for="item in (States=='book') ? searchBookList:searchUserList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          <Option
+            v-for="item in showSearchList"
+            :value="item.value"
+            :key="item.value"
+          >{{ item.label }}</Option>
         </Select>
         <div style="display:inline-block">
           <Input search placeholder="搜索前请选择搜索对象..." v-model="searchTxt" @on-search="searchBook"/>
         </div>
       </div>
-      <Table
-        :style="{margin: '20px'}"
-        :columns="(States=='book') ? columns1:columns2"
-        :data="showList"
-      ></Table>
+      <Table :style="{margin: '20px'}" :columns="showColumns" :data="showList"></Table>
       <Page
         :total="dataCount"
         :page-size="pageSize"
@@ -33,6 +33,8 @@ export default {
       showList: [],
       searchType: "",
       searchTxt: "",
+      showSearchList: [],
+      showColumns: [],
       searchBookList: [
         {
           value: "ISBN",
@@ -67,9 +69,23 @@ export default {
         {
           value: "userDept",
           label: "学部"
-        },
+        }
       ],
-      columns1: [
+      searchAdminList: [
+        {
+          value: "adminId",
+          label: "ID"
+        },
+        {
+          value: "adminName",
+          label: "姓名"
+        },
+        {
+          value: "permission",
+          label: "权限"
+        }
+      ],
+      columnsBook: [
         {
           title: "ISBN",
           key: "ISBN"
@@ -113,7 +129,7 @@ export default {
           key: "bookNote"
         }
       ],
-      columns2: [
+      columnsUser: [
         {
           title: "学号",
           key: "userId"
@@ -134,6 +150,34 @@ export default {
         {
           title: "学部",
           key: "userDept"
+        },
+        {
+          title: "备注",
+          key: "note"
+        }
+      ],
+      columnsAdmin: [
+        {
+          title: "工号",
+          key: "adminId"
+        },
+        {
+          title: "姓名",
+          key: "adminName"
+        },
+        {
+          title: "性别",
+          key: "adminSex",
+          sortable: true
+        },
+        {
+          title: "电话",
+          key: "adminPhone"
+        },
+        {
+          title: "权限",
+          key: "permission",
+          sortable: true
         },
         {
           title: "备注",
@@ -182,7 +226,25 @@ export default {
       this.dataCount = this.totalList.length;
     }
   },
-  created() {}
+  created() {
+    switch (this.States) {
+      case "book":
+        this.showColumns = this.columnsBook;
+        this.showSearchList = this.searchBookList;
+        break;
+      case "user":
+        this.showColumns = this.columnsUser;
+        this.showSearchList = this.searchUserList;
+        break;
+      case "admin":
+        this.showColumns = this.columnsAdmin;
+        this.showSearchList = this.searchAdminList;
+        break;
+
+      default:
+        break;
+    }
+  }
 };
 </script>
 <style scoped>
