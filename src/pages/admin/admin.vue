@@ -47,7 +47,7 @@
             type="md-menu"
             size="24"
           ></Icon>
-          <span>你好,{{adminId}}</span>
+          <span>你好,{{adminName}}</span>
         </Header>
         <Content
           :style="{margin: '20px', background: '#fff', minHeight: '260px'}"
@@ -88,7 +88,7 @@
                 ></DatePicker>
               </div>
               <div style="position: absolute;bottom: -40px;">
-                <Button type="info" @click.native="clearAddBook">清空</Button>
+                <Button type="info" @click.native="clearAdd">清空</Button>
               </div>
               <div class="addBookBtn">
                 <Button type="info" @click.native="addBookSQL">添加书籍</Button>
@@ -178,7 +178,7 @@
                   <Input v-else v-model="item.data" style="width: 150px;display:inline-block"/>
                 </div>
                 <div style="margin-top:10px">
-                  <Button type="info" style="margin-right:10px" @click.native="toCheUser">进行修改</Button>
+                  <Button type="info" style="margin-right:10px" @click.native="toCheAdmin">进行修改</Button>
                   <Button type="info" style="margin-right:10px" @click.native="sureChe">确认修改</Button>
                 </div>
               </div>
@@ -191,7 +191,8 @@
         >
           <div style="margin: 2%;">
             <Button type="primary" @click.native="getAdminList">获取管理员列表</Button>
-            <Button type="info" @click.native="cheAdmin">修改管理员信息</Button>
+            <Button type="info" @click.native="addAdminF" v-show="permission<=2">添加管理员</Button>
+            <Button type="info" @click.native="cheAdmin" v-show="permission<=2">修改管理员信息</Button>
           </div>
           <dataList :totalList="adminList" States="admin" :ifSearch="stateTrue" v-if="adminNav[0]"></dataList>
           <div class="cheUser" v-if="adminNav[1]">
@@ -205,7 +206,11 @@
               />
               <dataList :totalList="searchCheAdmin" States="admin" :ifSearch="stateFalse"></dataList>
               <div style="margin-top:20px">
-                <div v-for="item in updateAdmin" class="addBookContent" style="display:inline-block">
+                <div
+                  v-for="item in updateAdmin"
+                  class="addBookContent"
+                  style="display:inline-block"
+                >
                   <div
                     style="width:52px;display:inline-flex;justify-content:center;align-items:center"
                   >
@@ -215,8 +220,31 @@
                   <Input v-else v-model="item.data" style="width: 150px;display:inline-block"/>
                 </div>
                 <div style="margin-top:10px">
-                  <Button type="info" style="margin-right:10px" @click.native="toCheUser">进行修改</Button>
-                  <Button type="info" style="margin-right:10px" @click.native="sureChe">确认修改</Button>
+                  <Button type="info" style="margin-right:10px" @click.native="toCheAdmin">进行修改</Button>
+                  <Button type="info" style="margin-right:10px" @click.native="sureCheAdmin">确认修改</Button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="addBook" v-show="adminNav[2]">
+            <div style="position: relative">
+              <div v-for="item in addAdmin" class="addBookContent">
+                <div
+                  style="width:52px;display:inline-flex;justify-content:center;align-items:center"
+                >
+                  <span>{{item.label}}:</span>
+                </div>
+                <Input
+                  v-model="item.data"
+                  :placeholder="item.checked"
+                  style="width: 150px;display:inline-block"
+                  v-if="item.label!='出版时间'"
+                />
+                <div style="position: absolute;bottom: -40px;">
+                  <Button type="info" @click.native="clearAdd">清空</Button>
+                </div>
+                <div class="addBookBtn">
+                  <Button type="info" @click.native="addAdminSQL">添加管理员</Button>
                 </div>
               </div>
             </div>
@@ -240,7 +268,8 @@ export default {
   data() {
     return {
       adminId: "",
-      permission: "",
+      adminName: "",
+      permission: 3,
       userIdLong: 12,
       stateTrue: true,
       stateFalse: false,
@@ -248,7 +277,7 @@ export default {
       navData: [false, false, false, false, false],
       bookNav: [false, false, false, false],
       userNav: [false, false],
-      adminNav: [false, false],
+      adminNav: [false, false,false],
       addBookLong: 13,
       addBook: [
         {
@@ -406,7 +435,7 @@ export default {
           data: ""
         }
       ],
-      updateAdmin:[
+      updateAdmin: [
         {
           value: "adminId",
           label: "ID",
@@ -441,8 +470,52 @@ export default {
           value: "note",
           label: "备注",
           data: ""
-        },
+        }
       ],
+      addAdmin: [
+        {
+          value: "admin",
+          label: "工号",
+          data: "",
+          checked: "必填+数字.."
+        },
+        {
+          value: "adminName",
+          label: "姓名",
+          data: "",
+          checked: "必填.."
+        },
+        {
+          value: "pessword",
+          label: "密码",
+          data: "",
+          checked: "必填.."
+        },
+        {
+          value: "adminSex",
+          label: "性别",
+          data: "",
+          checked: "必填"
+        },
+        {
+          value: "adminPhone",
+          label: "电话",
+          data: "",
+          checked: "必填"
+        },
+        {
+          value: "permission",
+          label: "权限",
+          data: "",
+          checked: "必填"
+        },
+        {
+          value: "note",
+          label: "备注",
+          data: "",
+          checked: "选填.."
+        }
+      ]
     };
   },
   computed: {
@@ -453,18 +526,26 @@ export default {
       return ["menu-item", this.isCollapsed ? "collapsed-menu" : ""];
     }
   },
-  created() {
+  async created() {
     if (this.$route.params.userId == undefined) {
       alert("请登录！");
       this.$router.push({ name: "login" });
     } else {
       this.adminId = this.$route.params.userId;
-      this.permission = this.$route.params.permission;
+      let data = {
+        adminId: this.adminId
+      };
+      let result = await AdminServie.searchAdmin(data);
+      this.permission = result.data.data.permission;
+      this.adminName = result.data.data.adminName;
     }
   },
   methods: {
-    clearAddBook() {
+    clearAdd() {
       this.addBook.map(item => {
+        item.data = "";
+      });
+      this.addAdmin.map(item => {
         item.data = "";
       });
     },
@@ -500,7 +581,7 @@ export default {
     },
     async addBookF() {
       this.changeChildNav(1, "bookNav");
-      this.clearAddBook();
+      this.clearAdd();
     },
     changepage(index) {
       var _start = (index - 1) * this.pageSize;
@@ -708,6 +789,35 @@ export default {
         this.updateAdmin[i].data = "";
       }
     },
+    toCheAdmin() {
+      if (this.searchCheAdmin[0] == undefined) {
+        alert("未搜索到管理员!!!");
+      } else {
+        for (let i = 0; i < this.updateAdmin.length; i++) {
+          this.updateAdmin[i].data = this.searchCheAdmin[0][
+            this.updateAdmin[i].value
+          ];
+        }
+      }
+    },
+    async sureCheAdmin() {
+      if (this.updateAdmin[0].data == "") alert("请确认修改内容!!!");
+      else {
+        let update = {};
+        for (let i = 0; i < this.updateAdmin.length; i++) {
+          if (this.updateAdmin[i].data == null)
+            update[this.updateAdmin[i].value] = "";
+          else update[this.updateAdmin[i].value] = this.updateAdmin[i].data;
+        }
+        let result = await AdminServie.updateAdmin(update);
+        if (result.data.data == "success") alert("修改成功");
+        else alert("修改失败,请重试");
+      }
+    },
+    async addAdminF() {
+      this.changeChildNav(2, "adminNav");
+      this.clearAdd();
+    }
   }
 };
 </script>

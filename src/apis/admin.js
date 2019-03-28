@@ -42,4 +42,8 @@ AdminServie.getAdminList=function(){
 AdminServie.searchAdmin=function(data){
     return request.post('/Admin/searchAdmin',data)
 }
+//更新管理员接口
+AdminServie.updateAdmin=function(data){
+    return request.post('/Admin/updateAdmin',data)
+}
 export default AdminServie
