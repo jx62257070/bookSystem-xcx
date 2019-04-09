@@ -46,4 +46,12 @@ AdminServie.searchAdmin=function(data){
 AdminServie.updateAdmin=function(data){
     return request.post('/Admin/updateAdmin',data)
 }
+//借书接口
+AdminServie.borrowBook=function(data){
+    return request.post('/Admin/borrowBook',data)
+}
+//还书接口
+AdminServie.returnBook=function(data){
+    return request.post('/Admin/returnBook',data)
+}
 export default AdminServie

@@ -65,7 +65,7 @@
           </div>
           <div class="addBook" v-show="bookNav[1]">
             <div style="position: relative">
-              <div v-for="item in addBook" class="addBookContent">
+              <div v-for="(item,index) in addBook" class="addBookContent" :key="(item,index)">
                 <div
                   style="width:52px;display:inline-flex;justify-content:center;align-items:center"
                 >
@@ -119,7 +119,12 @@
               />
               <dataList :totalList="searchDelBook" States="book" :ifSearch="stateFalse"></dataList>
               <div style="margin-top:20px">
-                <div v-for="item in updateBook" class="addBookContent" style="display:inline-block">
+                <div
+                  v-for="(item,index) in updateBook"
+                  class="addBookContent"
+                  style="display:inline-block"
+                  :key="(item,index)"
+                >
                   <div
                     style="width:52px;display:inline-flex;justify-content:center;align-items:center"
                   >
@@ -168,7 +173,12 @@
               />
               <dataList :totalList="searchCheUser" States="user" :ifSearch="stateFalse"></dataList>
               <div style="margin-top:20px">
-                <div v-for="item in updateUser" class="addBookContent" style="display:inline-block">
+                <div
+                  v-for="(item,index) in updateUser"
+                  class="addBookContent"
+                  style="display:inline-block"
+                  :key="(item,index)"
+                >
                   <div
                     style="width:52px;display:inline-flex;justify-content:center;align-items:center"
                   >
@@ -207,9 +217,10 @@
               <dataList :totalList="searchCheAdmin" States="admin" :ifSearch="stateFalse"></dataList>
               <div style="margin-top:20px">
                 <div
-                  v-for="item in updateAdmin"
+                  v-for="(item,index) in updateAdmin"
                   class="addBookContent"
                   style="display:inline-block"
+                  :key="(item,index)"
                 >
                   <div
                     style="width:52px;display:inline-flex;justify-content:center;align-items:center"
@@ -228,7 +239,7 @@
           </div>
           <div class="addBook" v-show="adminNav[2]">
             <div style="position: relative">
-              <div v-for="item in addAdmin" class="addBookContent">
+              <div v-for="(item,index) in addAdmin" class="addBookContent" :key="(item,index)">
                 <div
                   style="width:52px;display:inline-flex;justify-content:center;align-items:center"
                 >
@@ -253,7 +264,58 @@
         <Content
           :style="{margin: '20px', background: '#fff', minHeight: '260px'}"
           v-show="navData[3]"
-        >borrowReturn</Content>
+        >
+          <div style="margin: 2%;">
+            <Button type="primary" @click.native="borrowBookNav">借 书</Button>
+            <Button type="info" @click.native="returnBookNav">还 书</Button>
+            <div class="cheUser" v-if="BRNav[0]">
+              <div style="margin-top:20px">
+                <p>借书</p>
+                <div
+                  v-for="(item,index) in borrowBook"
+                  class="addBookContent"
+                  style="display:inline-block"
+                  :key="(item,index)"
+                >
+                  <div
+                    style="width:52px;display:inline-flex;justify-content:center;align-items:center"
+                  >
+                    <span>{{item.label}}:</span>
+                  </div>
+                  <Input v-model="item.data" style="width: 150px;display:inline-block"/>
+                </div>
+                <div style="margin-top:10px">
+                  <Button type="info" style="margin-right:10px" @click.native="sureBorrow">确认借书</Button>
+                </div>
+              </div>
+            </div>
+            <div class="cheUser" v-if="BRNav[1]">
+              <div style="margin-top:20px">
+                <p>还书</p>
+                <div
+                  v-for="(item,index) in returnBook"
+                  class="addBookContent"
+                  style="display:inline-block"
+                  :key="(item,index)"
+                >
+                  <div
+                    style="width:52px;display:inline-flex;justify-content:center;align-items:center"
+                  >
+                    <span>{{item.label}}:</span>
+                  </div>
+                  <Input v-model="item.data" style="width: 150px;display:inline-block"/>
+                </div>
+                <div style="margin-top:10px">
+                  <Button type="info" style="margin-right:10px" @click.native="sureReturn">确认还书</Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Content>
+        <Content
+          :style="{margin: '20px', background: '#fff', minHeight: '260px'}"
+          v-show="navData[4]"
+        ></Content>
       </Layout>
     </Layout>
   </div>
@@ -277,7 +339,8 @@ export default {
       navData: [false, false, false, false, false],
       bookNav: [false, false, false, false],
       userNav: [false, false],
-      adminNav: [false, false,false],
+      adminNav: [false, false, false],
+      BRNav: [false, false],
       addBookLong: 13,
       addBook: [
         {
@@ -514,6 +577,30 @@ export default {
           label: "备注",
           data: "",
           checked: "选填.."
+        }
+      ],
+      borrowBook: [
+        {
+          value: "ISBN",
+          label: "ISBN",
+          data: ""
+        },
+        {
+          value: "userId",
+          label: "学号",
+          data: ""
+        }
+      ],
+      returnBook: [
+        {
+          value: "ISBN",
+          label: "ISBN",
+          data: ""
+        },
+        {
+          value: "userId",
+          label: "学号",
+          data: ""
         }
       ]
     };
@@ -817,6 +904,44 @@ export default {
     async addAdminF() {
       this.changeChildNav(2, "adminNav");
       this.clearAdd();
+    },
+    borrowBookNav() {
+      this.returnBook=[]
+      this.borrowBook=[]
+      this.changeChildNav(0, "BRNav");
+    },
+    returnBookNav() {
+      this.returnBook=[]
+      this.borrowBook=[]      
+      this.changeChildNav(1, "BRNav");
+    },
+    async sureBorrow() {
+      let data = {
+        ISBN: this.borrowBook[0].data,
+        userId: this.borrowBook[1].data
+      };
+      var result;
+      let sureData = confirm(
+        `确认借书操作[ISBN:${data.ISBN}],[学号:${data.userId}]？`
+      );
+      if (sureData == true) {
+        result = await AdminServie.borrowBook(data);
+        alert(result.data.data)
+      }
+    },
+    async sureReturn() {
+      let data = {
+        ISBN: this.returnBook[0].data,
+        userId: this.returnBook[1].data
+      };
+      var result;
+      let sureData = confirm(
+        `确认还书操作[ISBN:${data.ISBN}],[学号:${data.userId}]？`
+      );
+      if (sureData == true) {
+        let result = await AdminServie.returnBook(data);
+        alert(result.data.data)
+      }
     }
   }
 };

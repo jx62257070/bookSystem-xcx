@@ -1,4 +1,5 @@
 .layout{
+    height: 1000px;
     border: 1px solid #d7dde4;
     background: #f5f7f9;
     position: relative;
@@ -29,4 +30,11 @@
 }
 .searchTxt{
     display: inline-block;
+}
+.bookType{
+    height: 400px;
+    overflow: auto
+}
+.bookTypeList{
+    height: 30px;
 }
