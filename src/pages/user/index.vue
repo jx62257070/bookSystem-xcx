@@ -12,7 +12,7 @@
               </div>
             </MenuItem>
             <MenuItem name="2">
-              <Dropdown trigger="click" style="margin-left: 20px">
+              <Dropdown trigger="click" style="margin-left: 20px" @on-click="toBookType">
                 <p href="javascript:void(0)">
                   分类
                   <Icon type="ios-arrow-down"></Icon>
@@ -20,16 +20,16 @@
                 <DropdownMenu slot="list" class="bookType">
                   <DropdownItem
                     v-for="(item,index) in bookType"
+                    :name="item.code"
                     :key="(item,index)"
                     class="bookTypeList"
-                    @on-click="toBookType(item.code)"
                   >{{item.type}}</DropdownItem>
                 </DropdownMenu>
               </Dropdown>
               <!-- <Icon type="ios-apps-outline"></Icon>
               分类-->
             </MenuItem>
-            <MenuItem name="3">
+            <MenuItem name="3" @click.native="myBookcase">
               <Icon type="md-contact"></Icon>我的书架
             </MenuItem>
           </div>
@@ -39,6 +39,12 @@
         <Breadcrumb :style="{margin: '20px 0'}"></Breadcrumb>
         <Card>
           <div style="min-height: 400px;">
+            <div class="bookList" v-show="userNav[0]">
+              <dataList :totalList="showBookList" States="book" :ifSearch="stateTrue"></dataList>
+            </div>
+            <div v-show="userNav[1]">
+              <dataList :totalList="showBookList" States="book" :ifSearch="stateFalse"></dataList>
+            </div>
             <!-- <div class="bookType">
                         <div class="bookTypeList" v-for="(item,index) in bookType" :key="(item,index)"><Button type="info" ghost>{{item}}</Button></div>
             </div>-->
@@ -52,8 +58,9 @@
 <script>
 import bookCode from "@/utils/bookCode";
 import dataList from "@/components/dataList";
+import UserServie from "@/apis/user";
 export default {
-  comments: {
+  components: {
     dataList
   },
   data() {
@@ -61,15 +68,40 @@ export default {
       theme3: "light",
       userId: "",
       userName: "",
-      // bookType:['A','B','C','D','E','F','G','H','I','J','K','L','N','O','P','Q','R','S','T','U','V','X','Z'],
-      bookType: []
+      bookType: [],
+      userNav:[false,false],
+      stateTrue:true,
+      stateFalse:false,
+      showBookList:[]
     };
   },
   methods: {
-    toBookType() {}
+    clearList(){
+      showBookList=[];
+    },
+    async toBookType(name) {
+      this.showBookList()
+      this.changeChildNav(0,'userNav')
+      let data={
+        type:name
+      }
+      let result =await UserServie.getBookListByType(data)
+      console.log(name);
+    },
+    changeChildNav(name, nav) {
+      for (let i = 0; i < this[nav].length; i++) {
+        if (i == name) this.$set(this[nav], i, true);
+        //vue检测不到直接索引设置元素，用vue.$set(this.$set)来更新数组或者对象
+        else this.$set(this[nav], i, false);
+      }
+    },
+    myBookcase(){
+      this.showBookList()
+      this.changeChildNav(1,'userNav')
+    },
   },
   created() {
-    // this.userId=this.$route.params.userId
+    this.userId=this.$route.params.userId
     // this.userName=this.$route.params.userName
     this.bookType = bookCode;
   },
