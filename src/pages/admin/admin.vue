@@ -922,7 +922,7 @@ export default {
       };
         let sureData = confirm(`确认添加《${addAdminData.adminId}》吗？`);
         if (sureData == true) {
-          let result = await AdminServie.addBook(addAdminData);
+          let result = await AdminServie.addAdmin(addAdminData);
           if (result.data.data == "success") alert("添加成功");
           else if (result.data.data == "added") alert("已添加过的书籍!");
         }

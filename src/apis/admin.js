@@ -46,6 +46,10 @@ AdminServie.searchAdmin=function(data){
 AdminServie.updateAdmin=function(data){
     return request.post('/Admin/updateAdmin',data)
 }
+//更新管理员接口
+AdminServie.addAdmin=function(data){
+    return request.post('/Admin/addAdmin',data)
+}
 //借书接口
 AdminServie.borrowBook=function(data){
     return request.post('/Admin/borrowBook',data)
