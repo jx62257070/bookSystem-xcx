@@ -88,7 +88,7 @@
                 ></DatePicker>
               </div>
               <div style="position: absolute;bottom: -40px;">
-                <Button type="info" @click.native="clearAdd">清空</Button>
+                <Button type="info" @click.native="clearAdd('addBook')">清空</Button>
               </div>
               <div class="addBookBtn">
                 <Button type="info" @click.native="addBookSQL">添加书籍</Button>
@@ -252,7 +252,7 @@
                   v-if="item.label!='出版时间'"
                 />
                 <div style="position: absolute;bottom: -40px;">
-                  <Button type="info" @click.native="clearAdd">清空</Button>
+                  <Button type="info" @click.native="clearAdd('addAdmin')">清空</Button>
                 </div>
                 <div class="addBookBtn">
                   <Button type="info" @click.native="addAdminSQL">添加管理员</Button>
@@ -537,7 +537,7 @@ export default {
       ],
       addAdmin: [
         {
-          value: "admin",
+          value: "adminId",
           label: "工号",
           data: "",
           checked: "必填+数字.."
@@ -589,6 +589,11 @@ export default {
           value: "userId",
           label: "学号",
           data: ""
+        },
+        {
+          value: "note",
+          label: "备注",
+          data: ""
         }
       ],
       returnBook: [
@@ -600,6 +605,11 @@ export default {
         {
           value: "userId",
           label: "学号",
+          data: ""
+        },
+        {
+          value: "note",
+          label: "备注",
           data: ""
         }
       ]
@@ -628,11 +638,8 @@ export default {
     }
   },
   methods: {
-    clearAdd() {
-      this.addBook.map(item => {
-        item.data = "";
-      });
-      this.addAdmin.map(item => {
+    clearAdd(dataName) {
+      this[dataName].map(item => {
         item.data = "";
       });
     },
@@ -668,7 +675,7 @@ export default {
     },
     async addBookF() {
       this.changeChildNav(1, "bookNav");
-      this.clearAdd();
+      this.clearAdd('addBook');
     },
     changepage(index) {
       var _start = (index - 1) * this.pageSize;
@@ -903,22 +910,37 @@ export default {
     },
     async addAdminF() {
       this.changeChildNav(2, "adminNav");
-      this.clearAdd();
+      this.clearAdd('addAdmin');
+      let addAdminData = {
+        adminId: this.addAdmin[0].data,
+        adminName: this.addAdmin[1].data,
+        pessword: this.addAdmin[2].data,
+        adminSex: this.addAdmin[3].data,
+        adminPhone: this.addAdmin[4].data,
+        permission: this.addAdmin[5].data,
+        note: this.addAdmin[6].data
+      };
+        let sureData = confirm(`确认添加《${addAdminData.adminId}》吗？`);
+        if (sureData == true) {
+          let result = await AdminServie.addBook(addAdminData);
+          if (result.data.data == "success") alert("添加成功");
+          else if (result.data.data == "added") alert("已添加过的书籍!");
+        }
     },
     borrowBookNav() {
-      this.returnBook=[]
-      this.borrowBook=[]
+      this.clearAdd('borrowBook');
       this.changeChildNav(0, "BRNav");
     },
     returnBookNav() {
-      this.returnBook=[]
-      this.borrowBook=[]      
+      this.clearAdd('returnBook');
       this.changeChildNav(1, "BRNav");
     },
     async sureBorrow() {
       let data = {
         ISBN: this.borrowBook[0].data,
-        userId: this.borrowBook[1].data
+        userId: this.borrowBook[1].data,
+        note: this.borrowBook[2].data,
+        adminId:this.adminId,
       };
       var result;
       let sureData = confirm(
@@ -932,7 +954,9 @@ export default {
     async sureReturn() {
       let data = {
         ISBN: this.returnBook[0].data,
-        userId: this.returnBook[1].data
+        userId: this.returnBook[1].data,
+        note: this.returnBook[2].data,
+        adminId:this.adminId
       };
       var result;
       let sureData = confirm(
