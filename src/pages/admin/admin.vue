@@ -912,7 +912,8 @@ export default {
       this.changeChildNav(2, "adminNav");
       this.clearAdd('addAdmin');
       let addAdminData = {
-        adminId: this.addAdmin[0].data,
+        adminId:this.adminId,
+        newAdminId: this.addAdmin[0].data,
         adminName: this.addAdmin[1].data,
         pessword: this.addAdmin[2].data,
         adminSex: this.addAdmin[3].data,
@@ -920,11 +921,11 @@ export default {
         permission: this.addAdmin[5].data,
         note: this.addAdmin[6].data
       };
-        let sureData = confirm(`确认添加《${addAdminData.adminId}》吗？`);
+        let sureData = confirm(`确认添加《${addAdminData.newAdminId}》吗？`);
         if (sureData == true) {
           let result = await AdminServie.addAdmin(addAdminData);
           if (result.data.data == "success") alert("添加成功");
-          else if (result.data.data == "added") alert("已添加过的书籍!");
+          else if (result.data.data == "added") alert("已添加过的账号!");
         }
     },
     borrowBookNav() {
