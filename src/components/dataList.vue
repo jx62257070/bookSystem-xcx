@@ -183,7 +183,102 @@ export default {
           title: "备注",
           key: "note"
         }
-      ]
+      ],
+      columnsLogList: [
+        {
+          title: "工号",
+          key: "adminId"
+        },
+        {
+          title: "学号",
+          key: "userId"
+        },
+        {
+          title: "ISBN",
+          key: "ISBN",
+        },
+        {
+          title: "借书日期",
+          key: "borrowTime",
+          sortable: true
+        },
+        {
+          title: "还书日期",
+          key: "returnTime",
+          sortable: true
+        },
+        {
+          title: "是否return",
+          key: "isReturn"
+        },
+        {
+          title: "是否续借",
+          key: "(isReborrow"
+        },
+        {
+          title: "备注",
+          key: "note"
+        },
+      ],
+      columnsBRLog: [
+        {
+          title: "工号",
+          key: "adminId"
+        },
+        {
+          title: "学号",
+          key: "userId"
+        },
+        {
+          title: "ISBN",
+          key: "ISBN",
+        },
+        {
+          title: "借还确认",
+          key: "confirm"
+        },
+        {
+          title: "确认时间",
+          key: "time",
+          sortable: true
+        },
+        {
+          title: "备注",
+          key: "note"
+        }
+      ],
+      columnsAddBookLog: [
+        {
+          title: "工号",
+          key: "adminId"
+        },
+        {
+          title: "ISBN",
+          key: "ISBN"
+        },
+        {
+          title: "添加时间",
+          key: "add_time",
+          sortable: true
+        }
+      ],
+      columnsAddAdminLog: [
+        {
+          title: "操作者",
+          key: "adminId"
+        },
+        {
+          title: "新增管理员",
+          key: "newadminId"
+        },
+        {
+          title: "添加时间",
+          key: "add_time",
+          sortable: true
+        }
+      ],
+
+      
     };
   },
   props: {
@@ -239,6 +334,22 @@ export default {
       case "admin":
         this.showColumns = this.columnsAdmin;
         this.showSearchList = this.searchAdminList;
+        break;
+      case "LogList":
+        this.showColumns = this.columnsLogList;
+        this.showSearchList = this.searchLogList;
+        break;
+      case "BRLog":
+        this.showColumns = this.columnsBRLog;
+        this.showSearchList = this.searchBRLog;
+        break;
+      case "AddBookLog":
+        this.showColumns = this.columnsAddBookLog;
+        this.showSearchList = this.searchAddBookLog;
+        break;
+      case "AddAdminLog":
+        this.showColumns = this.columnsAddAdminLog;
+        this.showSearchList = this.searchAddAdminLog;
         break;
 
       default:

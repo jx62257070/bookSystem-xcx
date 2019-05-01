@@ -76,7 +76,7 @@
                   :placeholder="item.checked"
                   style="width: 150px;display:inline-block"
                   v-if="item.label!='出版时间'"
-                  :maxlength="addBookLong"
+                  :maxlength="item.long"
                 />
                 <DatePicker
                   format="yyyy年MM月dd日"
@@ -188,7 +188,7 @@
                   <Input v-else v-model="item.data" style="width: 150px;display:inline-block"/>
                 </div>
                 <div style="margin-top:10px">
-                  <Button type="info" style="margin-right:10px" @click.native="toCheAdmin">进行修改</Button>
+                  <Button type="info" style="margin-right:10px" @click.native="toCheUser">进行修改</Button>
                   <Button type="info" style="margin-right:10px" @click.native="sureChe">确认修改</Button>
                 </div>
               </div>
@@ -282,7 +282,7 @@
                   >
                     <span>{{item.label}}:</span>
                   </div>
-                  <Input v-model="item.data" style="width: 150px;display:inline-block"/>
+                  <Input v-model="item.data" style="width: 150px;display:inline-block" :maxlength="item.long"/>
                 </div>
                 <div style="margin-top:10px">
                   <Button type="info" style="margin-right:10px" @click.native="sureBorrow">确认借书</Button>
@@ -303,7 +303,7 @@
                   >
                     <span>{{item.label}}:</span>
                   </div>
-                  <Input v-model="item.data" style="width: 150px;display:inline-block"/>
+                  <Input v-model="item.data" style="width: 150px;display:inline-block" :maxlength="item.long"/>
                 </div>
                 <div style="margin-top:10px">
                   <Button type="info" style="margin-right:10px" @click.native="sureReturn">确认还书</Button>
@@ -315,7 +315,26 @@
         <Content
           :style="{margin: '20px', background: '#fff', minHeight: '260px'}"
           v-show="navData[4]"
-        ></Content>
+        >
+        <div class="operation">
+            <Button type="primary" @click.native="showBRList">借阅表</Button>
+            <Button type="info" @click.native="showBRLog">借阅日志</Button>
+            <Button type="info" @click.native="showAddBookLog">添加书籍日志</Button>
+            <Button type="info" @click.native="showAddAdminLog">添加管理员日志</Button>
+          </div>
+        <div class="bookList" v-show="logNav[0]">
+            <dataList :totalList="BRList" States="LogList" :ifSearch="stateTrue"></dataList>
+        </div>
+        <div class="bookList" v-show="logNav[1]">
+            <dataList :totalList="bookList" States="BRLog" :ifSearch="stateTrue"></dataList>
+        </div>
+        <div class="bookList" v-show="logNav[2]">
+            <dataList :totalList="bookList" States="AddBookLog" :ifSearch="stateTrue"></dataList>
+        </div>
+        <div class="bookList" v-show="logNav[3]">
+            <dataList :totalList="bookList" States="AddAdminLog" :ifSearch="stateTrue"></dataList>
+        </div>
+        </Content>
       </Layout>
     </Layout>
   </div>
@@ -341,67 +360,76 @@ export default {
       userNav: [false, false],
       adminNav: [false, false, false],
       BRNav: [false, false],
-      addBookLong: 13,
+      logNav:[false, false, false, false],
       addBook: [
         {
           value: "ISBN",
           label: "ISBN",
           data: "",
-          checked: "必填+数字.."
+          checked: "必填+数字..",
+          long:13
         },
         {
           value: "bookName",
           label: "书名",
           data: "",
-          checked: "必填.."
+          checked: "必填..",
+          long:50
         },
         {
           value: "author",
           label: "作者",
           data: "",
-          checked: "必填.."
+          checked: "必填..",
+          long:20
         },
         {
           value: "type",
           label: "类型",
           data: "",
-          checked: "必填+大写字母.."
+          checked: "必填+大写字母..",
+          long:1
         },
         {
           value: "press",
           label: "出版社",
           data: "",
-          checked: "选填.."
+          checked: "选填..",
+          long:30
         },
         {
           value: "pressTime",
           label: "出版时间",
           data: "",
-          checked: "选填.."
+          checked: "选填..",
         },
         {
           value: "stock",
           label: "库存",
           data: "",
-          checked: "必填.."
+          checked: "必填..",
+          long:5
         },
         {
           value: "position",
           label: "位置",
           data: "",
-          checked: "必填.."
+          checked: "必填..",
+          long:10
         },
         {
           value: "price",
-          label: "单价",
+          label: "单价/元",
           data: "",
-          checked: "选填.."
+          checked: "选填..",
+          long:10
         },
         {
           value: "note",
           label: "备注",
           data: "",
-          checked: "选填.."
+          checked: "选填..",
+          long:200
         }
       ],
       bookList: [],
@@ -583,12 +611,14 @@ export default {
         {
           value: "ISBN",
           label: "ISBN",
-          data: ""
+          data: "",
+          long:13
         },
         {
           value: "userId",
           label: "学号",
-          data: ""
+          data: "",
+          long:12
         },
         {
           value: "note",
@@ -600,12 +630,14 @@ export default {
         {
           value: "ISBN",
           label: "ISBN",
-          data: ""
+          data: "",
+          long:12
         },
         {
           value: "userId",
           label: "学号",
-          data: ""
+          data: "",
+          long:12
         },
         {
           value: "note",
@@ -760,6 +792,7 @@ export default {
             ISBN: this.searchDelBook[0].ISBN
           };
           let result = await AdminServie.delBook(data);
+          alert("删除成功")
         }
       }
     },
@@ -911,6 +944,8 @@ export default {
     async addAdminF() {
       this.changeChildNav(2, "adminNav");
       this.clearAdd('addAdmin');
+    },
+    async addAdminSQL(){
       let addAdminData = {
         adminId:this.adminId,
         newAdminId: this.addAdmin[0].data,
@@ -921,7 +956,7 @@ export default {
         permission: this.addAdmin[5].data,
         note: this.addAdmin[6].data
       };
-        let sureData = confirm(`确认添加《${addAdminData.newAdminId}》吗？`);
+      let sureData = confirm(`确认添加《${addAdminData.newAdminId}》吗？`);
         if (sureData == true) {
           let result = await AdminServie.addAdmin(addAdminData);
           if (result.data.data == "success") alert("添加成功");
@@ -967,7 +1002,22 @@ export default {
         let result = await AdminServie.returnBook(data);
         alert(result.data.data)
       }
-    }
+    },
+    async showBRList(){
+      this.changeChildNav(0, "logNav");
+    },
+    async showBRLog(){
+      this.changeChildNav(1, "logNav");
+    },
+    async showAddBookLog(){
+      this.changeChildNav(2, "logNav");
+    },
+    async showAddAdminLogt(){
+      this.changeChildNav(3, "logNav");
+    },
+
+
+
   }
 };
 </script>
